@@ -2,12 +2,10 @@ spring:
   application:
     name: api-gateway
   cloud:
-    loadbalancer:
-      rule: random
-    gateway:
-      routes:
+    config:
+      uri: http://localhost:8888  # Config Server
 
 eureka:
   client:
-    serviceUrl:
+    service-url:
       defaultZone: http://localhost:8761/eureka/
