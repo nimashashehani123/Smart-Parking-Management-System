@@ -3,9 +3,12 @@ spring:
     name: api-gateway
   cloud:
     config:
-      uri: http://localhost:8888  # Config Server
+      uri: http://localhost:8888 # Make sure this is correct
+
+
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8761/eureka
+
