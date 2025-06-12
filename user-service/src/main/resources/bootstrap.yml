@@ -3,11 +3,15 @@ server.port: 8081
 spring:
   application:
     name: user-service
+
   cloud:
     config:
       uri: http://localhost:8888
+      name: user-service
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8761/eureka
+
+
