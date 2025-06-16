@@ -1,23 +1,33 @@
 package com.example.userservice.entity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Table(name = "users")
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
+
+    @Column(unique = true, nullable = false)
     private String email;
 
-    // Getters and Setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    private String password;
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    // Getters and setters
 }
