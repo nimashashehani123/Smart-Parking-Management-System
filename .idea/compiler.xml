@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -9,6 +10,7 @@
         <module name="config-server" />
         <module name="payment-service" />
         <module name="vehicle-service" />
+        <module name="reservation-service" />
         <module name="api-gateway" />
         <module name="user-service" />
         <module name="eureka-server" />
@@ -23,6 +25,7 @@
       <module name="eureka-server" options="-parameters" />
       <module name="parking-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
+      <module name="reservation-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
       <module name="vehicle-service" options="-parameters" />
     </option>
