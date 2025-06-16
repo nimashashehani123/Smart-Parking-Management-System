@@ -10,9 +10,13 @@ spring:
         git:
           uri: https://github.com/nimashashehani123/spms-config-repo
           default-label: main
-          clone-on-start: true
+#          clone-on-start: true
+          username: nimashashehani123
+          password: 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
+
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
