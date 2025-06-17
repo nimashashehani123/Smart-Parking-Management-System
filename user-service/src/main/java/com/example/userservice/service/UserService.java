@@ -8,5 +8,7 @@ public interface UserService {
     User registerUser(UserDTO userDTO);
     List<User> getAllUsers();
     User getUserById(Long id);
+    User findByEmail(String email);
+
 }
 
