@@ -5,10 +5,11 @@ import com.example.userservice.entity.User;
 import java.util.List;
 
 public interface UserService {
-    User registerUser(UserDTO userDTO);
+    int registerUser(UserDTO userDTO);
     List<User> getAllUsers();
     User getUserById(Long id);
     User findByEmail(String email);
-
+    User updateUser(Long id, UserDTO dto);
+    UserDTO loadUserDetailsByUsername(String email);
 }
 
