@@ -67,7 +67,7 @@ Smart-Parking-Management-System/
 ## ✅ Submission Resources
 
 - 🔗 **Postman Collection:**  
-  [Postman Collection](./Smart Parking Management System.postman_collection.json)
+  [Postman Collection](./postman_collection.json)
 
 - 🖼️ **Eureka Dashboard Screenshot:**  
   ![Eureka Dashboard](./docs/screenshots/eureka_dashboard.png)
