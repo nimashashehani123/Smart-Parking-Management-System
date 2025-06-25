@@ -25,7 +25,7 @@ Smart-Parking-Management-System/
 
 ├── payment-service/
 
-├── Smart-Parking-Management-System.postman_collection.json
+├── postman_collection.json
 
 ├── README.md
 
