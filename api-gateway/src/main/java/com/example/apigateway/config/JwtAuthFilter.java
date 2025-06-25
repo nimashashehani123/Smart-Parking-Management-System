@@ -44,7 +44,7 @@ public class JwtAuthFilter implements WebFilter {
         String token = authHeader.substring(7);
         try {
             String email = jwtUtil.extractUsername(token);
-            String role = jwtUtil.extractRole(token); // Should return "USER" or "ADMIN"
+            String role = jwtUtil.extractRole(token); // Should return "USER" or "OWNER"
             System.out.println("role: " + role);
 
             if (email == null || jwtUtil.isTokenExpired(token)) {

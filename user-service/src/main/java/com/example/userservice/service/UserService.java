@@ -1,4 +1,5 @@
 package com.example.userservice.service;
+import com.example.userservice.dto.ReservationDTO;
 import com.example.userservice.dto.UserDTO;
 import com.example.userservice.entity.User;
 
@@ -11,5 +12,7 @@ public interface UserService {
     User findByEmail(String email);
     User updateUser(Long id, UserDTO dto);
     UserDTO loadUserDetailsByUsername(String email);
+    List<ReservationDTO> getUserReservationHistory(Long userId);
+
 }
 

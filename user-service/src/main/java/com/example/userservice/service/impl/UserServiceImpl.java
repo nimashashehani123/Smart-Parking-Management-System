@@ -1,4 +1,6 @@
 package com.example.userservice.service.impl;
+import com.example.userservice.dto.ReservationDTO;
+import com.example.userservice.dto.ResponseDTO;
 import com.example.userservice.dto.UserDTO;
 import com.example.userservice.entity.Role;
 import com.example.userservice.entity.User;
@@ -6,8 +8,10 @@ import com.example.userservice.repository.UserRepository;
 import com.example.userservice.service.UserService;
 import com.example.userservice.utill.JwtUtil;
 import com.example.userservice.utill.VarList;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +19,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +31,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private ModelMapper modelMapper;
 
@@ -33,6 +40,15 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Autowired
     private JwtUtil jwtTokenUtil;
+
+    @Autowired
+    private WebClient.Builder webClientBuilder;
+
+    @Value("http://localhost:8080/api/v1/reservations/")
+    private String reservationServiceUrl;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
 
@@ -71,13 +87,24 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
     @Override
     public User updateUser(Long id, UserDTO dto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        modelMapper.map(dto, user);
-        return userRepository.save(user);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Only update specific fields from DTO
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        return userRepository.save(user);
     }
+
 
 
     @Override
@@ -102,4 +129,23 @@ public class UserServiceImpl implements UserDetailsService, UserService {
                 getAuthority(user) // Convert role to GrantedAuthority
         );
     }
+
+    @Override
+    public List<ReservationDTO> getUserReservationHistory(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String url = reservationServiceUrl + "user/" + userId;
+        ResponseDTO response = webClientBuilder.build()
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(ResponseDTO.class)
+                .block();
+
+        ReservationDTO[] reservation = objectMapper.convertValue(response.getData(), ReservationDTO[].class);
+
+        return Arrays.asList(reservation);
+    }
+
 }

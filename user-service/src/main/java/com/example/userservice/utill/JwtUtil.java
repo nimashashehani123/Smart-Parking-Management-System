@@ -24,7 +24,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    public static final long JWT_TOKEN_VALIDITY = 12 * 60 * 60; // 12 hours in seconds
+    public static final long JWT_TOKEN_VALIDITY = 90L * 24 * 60 * 60; // 3 months in seconds
 
     public Key getSigningKey() {
         return Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));

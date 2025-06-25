@@ -18,13 +18,10 @@ public class Reservation {
     private Long id;
 
     private Long userId;
-    private Long vehicleId;
-    private Long parkingId;
+    private Long parkingSpaceId;
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    private String status; // confirmed, cancelled, completed
-
-    // Getters and setters
+    private String status; // ACTIVE, CANCELLED
 }

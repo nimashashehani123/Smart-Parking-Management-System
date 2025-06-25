@@ -54,8 +54,13 @@ public class UserSecurityConfig {
       return http
               .csrf(csrf -> csrf.disable())
               .authorizeHttpRequests(auth -> auth
-                      .requestMatchers("/api/v1/users/login", "/api/v1/users/register").permitAll()
-                      .requestMatchers("/api/v1/users/all").hasRole("USER")
+                      .requestMatchers("/api/v1/users/login",
+                                       "/api/v1/users/register"
+                      ).permitAll()
+                      .requestMatchers("/api/v1/users/all").hasRole("OWNER")
+                      .requestMatchers("/api/v1/users/updateUser/**").hasRole("USER")
+                      .requestMatchers("/api/v1/users/getUser/**").hasRole("USER")
+                      .requestMatchers("/api/v1/users/bookings/**").hasRole("USER")
               )
               .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
               .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

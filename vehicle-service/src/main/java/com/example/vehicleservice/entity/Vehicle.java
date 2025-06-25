@@ -21,6 +21,5 @@ public class Vehicle {
     private String plateNumber;
     private String model;
     private String color;
-
     // Getters and setters
 }

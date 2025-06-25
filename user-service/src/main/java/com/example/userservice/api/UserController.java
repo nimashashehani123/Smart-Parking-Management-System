@@ -1,5 +1,6 @@
 package com.example.userservice.api;
 import com.example.userservice.dto.AuthDTO;
+import com.example.userservice.dto.ReservationDTO;
 import com.example.userservice.dto.ResponseDTO;
 import com.example.userservice.dto.UserDTO;
 import com.example.userservice.entity.User;
@@ -33,34 +34,26 @@ public class UserController {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
     }
-
     @PostMapping("/register")
     public ResponseEntity<ResponseDTO> registerUser(@RequestBody UserDTO userDTO) {
         try {
             int res = userService.registerUser(userDTO);
-                switch (res) {
-                    case VarList.Created -> {
-                        return ResponseEntity.status(HttpStatus.CREATED)
-                                .body(new ResponseDTO(VarList.Created, "Success", userDTO));
-                    }
-                    case VarList.Not_Acceptable -> {
-                        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-                                .body(new ResponseDTO(VarList.Not_Acceptable, "Email Already Used", null));
-                    }
-                    default -> {
-                        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                                .body(new ResponseDTO(VarList.Bad_Gateway, "Error", null));
-                    }
-                }
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
-            }
+            return switch (res) {
+                case VarList.Created -> ResponseEntity.status(HttpStatus.CREATED)
+                        .body(new ResponseDTO(VarList.Created, "Success", userDTO));
+                case VarList.Not_Acceptable -> ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                        .body(new ResponseDTO(VarList.Not_Acceptable, "Email Already Used", null));
+                default -> ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                        .body(new ResponseDTO(VarList.Bad_Gateway, "Error", null));
+            };
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
         }
-
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO> authenticate(@RequestBody UserDTO userDTO ,HttpServletRequest request) {
+    public ResponseEntity<ResponseDTO> authenticate(@RequestBody UserDTO userDTO, HttpServletRequest request) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userDTO.getEmail(), userDTO.getPassword()));
@@ -75,10 +68,7 @@ public class UserController {
                     .body(new ResponseDTO(VarList.Conflict, "Authorization Failure! Please Try Again", null));
         }
 
-// ✅ Use loadedUser (has role) instead of userDTO
-        System.out.println(loadedUser);
         String token = jwtUtil.generateToken(loadedUser);
-
         if (token == null || token.isEmpty()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ResponseDTO(VarList.Conflict, "Authorization Failure! Please Try Again", null));
@@ -87,37 +77,65 @@ public class UserController {
         AuthDTO authDTO = new AuthDTO();
         authDTO.setEmail(loadedUser.getEmail());
         authDTO.setToken(token);
-        String authHeader = request.getHeader("Authorization");
-        System.out.println("User-Service received Authorization header: " + authHeader);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseDTO(VarList.Created, "Success", authDTO));
     }
 
-
-
-    @PutMapping("/{id}")
+    @PutMapping("/updateUser/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserDTO dto) {
+    public ResponseEntity<ResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO dto) {
         User user = userService.getUserById(id);
-
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseDTO(VarList.Not_Found, "User not found", null));
         }
-        userService.updateUser(id, dto);
-        return ResponseEntity.ok("User updated successfully");
+
+        User updated = userService.updateUser(id, dto);
+        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "User updated successfully", updated));
     }
+
     @GetMapping("/all")
-    @PreAuthorize("hasRole('USER')")
-    public List<User> getAllUsers(HttpServletRequest request) {
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<ResponseDTO> getAllUsers(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         System.out.println("User-Service received Authorization header: " + authHeader);
-        return userService.getAllUsers();
+
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "All Users", users));
     }
 
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    @GetMapping("/getUser/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseDTO> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseDTO(VarList.Not_Found, "User not found", null));
+        }
+
+        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "User found", user));
+    }
+
+    @GetMapping("/bookings/{userId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseDTO> getBookingHistory(@PathVariable Long userId) {
+        try {
+            List<ReservationDTO> history = userService.getUserReservationHistory(userId);
+            if (history == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new ResponseDTO(VarList.Internal_Server_Error, "Failed to fetch booking history", null));
+            }
+
+            if (history.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseDTO(VarList.No_Content, "No bookings found for this user", history));
+            }
+            return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Booking history fetched successfully", history));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
     }
 }
 

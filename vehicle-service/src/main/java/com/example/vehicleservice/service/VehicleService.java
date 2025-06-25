@@ -9,5 +9,6 @@ public interface VehicleService {
     Vehicle addVehicle(VehicleDTO dto);
     List<Vehicle> getAllVehicles();
     List<Vehicle> getVehiclesByUserId(Long userId);
-
+    Vehicle updateVehicle(Long id, VehicleDTO dto);
+    Vehicle getVehicleById(Long id);
 }

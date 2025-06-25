@@ -3,14 +3,15 @@ package com.example.parkingservice.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ParkingSpaceDTO {
-    private Long ownerId;
-    private String location;
-    private String status;
-    private String zone;
-    private Double pricePerHour;
+@Component
+public class ResponseDTO {
+    private int code;
+    private String message;
+    private Object data;
 }

@@ -5,8 +5,16 @@ import com.example.parkingservice.entity.ParkingSpace;
 
 import java.util.List;
 
+import com.example.parkingservice.dto.ParkingSpaceDTO;
+
+import java.util.List;
+
 public interface ParkingSpaceService {
-    ParkingSpace addSpace(ParkingSpaceDTO dto);
-    List<ParkingSpace> getAll();
-    List<ParkingSpace> getByOwner(Long ownerId);
+    int addParkingSpace(ParkingSpaceDTO dto);
+    int updateParkingSpace(Long id,ParkingSpaceDTO dto);
+    int changeStatus(Long id, String status);
+    List<ParkingSpaceDTO> getByZone(String zone);
+    List<ParkingSpaceDTO> getAvailableSpaces();
+    ParkingSpaceDTO getById(Long id);
+
 }

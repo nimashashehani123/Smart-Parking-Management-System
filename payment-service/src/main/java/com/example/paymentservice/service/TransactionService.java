@@ -4,8 +4,10 @@ import com.example.paymentservice.dto.TransactionDTO;
 import com.example.paymentservice.entity.Transaction;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TransactionService {
     Transaction makePayment(TransactionDTO dto);
-    List<Transaction> getUserTransactions(Long userId);
+    Optional<Transaction> getTransactionById(Long id);
+
 }
