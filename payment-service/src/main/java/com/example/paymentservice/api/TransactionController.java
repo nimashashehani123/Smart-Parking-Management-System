@@ -42,7 +42,7 @@ public class TransactionController {
 
     @GetMapping("/receipt/{transactionId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<byte[]> getReceipt(@PathVariable Long transactionId) {
+    public ResponseEntity<?> getReceipt(@PathVariable Long transactionId) {
         Optional<Transaction> tx = service.getTransactionById(transactionId);
 
         if (tx.isPresent()) {
@@ -53,8 +53,11 @@ public class TransactionController {
                     .body(pdf);
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        // Transaction not found: return structured error
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ResponseDTO(VarList.Not_Found, "Transaction not found. Cannot generate receipt.", null));
     }
+
 
 
 }
